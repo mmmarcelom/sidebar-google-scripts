@@ -4,6 +4,7 @@ Como criar uma sidebar no google scripts
 Eu criei essa planilha para ajudar com a confecção de cestas de café da manhã em uma floricultura.
 
 Para evitar a criação de várias barras laterais, uma para cada função, utilizei accordeons (disponível no bootstrap).
+
 ![Planilha de Evento em Floricultura - Planilhas Google - Google Chrome 2022-06-03 09-09-26](https://user-images.githubusercontent.com/52570539/171851005-6ff8960d-c7da-4b26-ab7e-5e4539707c12.gif)
 
 Através de javascript e html, os funcionários da recepção podem cadastrar os pedidos em uma barra lateral.
