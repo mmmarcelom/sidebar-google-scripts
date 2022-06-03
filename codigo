@@ -1,0 +1,110 @@
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu('Floricultura')
+    .addItem('Iniciar aplicativo', 'mostrarSidebar')
+    .addToUi()
+ 
+  mostrarSidebar()
+}
+
+function mostrarSidebar(){
+  var html = HtmlService.createHtmlOutputFromFile('sidebar').setTitle('Floricultura');
+  SpreadsheetApp.getUi().showSidebar(html);
+}
+
+function carregarProdutosBack(){
+  const ss = SpreadsheetApp.getActiveSpreadsheet()
+  const pagina_produtos = ss.getSheetByName('Cadastro de Produtos')
+  const produtos = pagina_produtos.getRange("A2:A").getValues()
+  return produtos.map((item)=> item[0])
+}
+
+function carregarIngredientesBack(produto) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet()
+  const pagina_cadastro = ss.getSheetByName('Cadastro de Pedidos')
+  const pagina_componentes = ss.getSheetByName('Componentes')
+  
+  pagina_cadastro.getRange('A2:B').clear()
+
+  const itens = pagina_componentes.getRange(2,1, pagina_componentes.getLastRow(), 3).getValues()
+  const itensValidados = itens
+    .filter((item) => item[0] == produto)
+    .map((item) => [item[1], item[2]] )
+    
+  pagina_cadastro.getRange(2,1, itensValidados.length, 2).setValues(itensValidados)
+  
+  ss.setActiveSheet(pagina_cadastro)
+
+}
+
+function enviarPedidoBack(produto, numero_OS, observacao){
+  const ss = SpreadsheetApp.getActiveSpreadsheet()
+  const pagina_cadastro = ss.getSheetByName('Cadastro de Pedidos')
+  const pagina_pedido = ss.getSheetByName('Pedidos')
+  const pagina_necessidade = ss.getSheetByName('Necessidade')
+  
+  let itens = pagina_cadastro.getRange(2, 1, pagina_cadastro.getLastRow(),2).getValues()
+
+  const itensValidados = itens
+    .filter((item) => item[0] > 0 )
+    .map((item) => [item[1], item[0], numero_OS])
+
+  pagina_necessidade
+    .getRange(pagina_necessidade.getLastRow() + 1, 1, itensValidados.length, 3)
+    .setValues(itensValidados)
+
+  pagina_pedido.appendRow([numero_OS, produto, '1. Vendida', observacao])
+
+  ss.setActiveSheet(pagina_pedido);
+  ss.toast('Pedido cadastrado com sucesso')  
+  
+}
+
+function mostrarPagina(pagina){
+  const ss = SpreadsheetApp.getActiveSpreadsheet()
+  const paginaAtual = ss.getSheetByName(pagina)
+  ss.setActiveSheet(paginaAtual)
+}
+
+function criarListaCompras(){
+  const ss = SpreadsheetApp.getActiveSpreadsheet()
+  const pagina_estoque = ss.getSheetByName('Estoque')
+  const pagina_compras = ss.getSheetByName('Lista de Compras')
+   
+  let itens = pagina_estoque.getRange(2, 1, pagina_estoque.getLastRow(),4).getValues()
+
+  const itensValidados = itens
+    .filter((item) => item[3] > 0 )
+    .map((item) => [item[0], item[3]])
+
+  pagina_compras.getRange('A2:B').clear()
+  pagina_compras
+    .getRange(2, 1, itensValidados.length, 2)
+    .setValues(itensValidados)
+
+  ss.setActiveSheet(pagina_compras)
+  ss.toast('Lista criada com sucesso')  
+
+}
+
+function adicionarEstoque(){
+  const ss = SpreadsheetApp.getActiveSpreadsheet()
+  const pagina_comprado = ss.getSheetByName('Comprado')
+  const pagina_compras = ss.getSheetByName('Lista de Compras')
+  const pagina_estoque = ss.getSheetByName('Estoque')
+
+  let itens = pagina_compras.getRange(2, 1, pagina_compras.getLastRow(),3).getValues()
+
+  const itensValidados = itens
+    .filter((item) => item[1] > 0 )
+
+  pagina_comprado
+    .getRange(pagina_comprado.getLastRow() + 1, 1, itensValidados.length, 3)
+    .setValues(itensValidados)
+
+  pagina_estoque.getRange('A2:A').clear()
+  
+  ss.setActiveSheet(pagina_estoque)
+  ss.toast('Lista adicionada com sucesso')  
+
+}
